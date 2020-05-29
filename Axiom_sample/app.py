@@ -72,10 +72,7 @@ def login():
 wsgi_app = app.wsgi_app
 
 
-#@app.route('/')
-#def hello():
-#    """Renders a sample page."""
-#    return "Hello World!"
+
 
 if __name__ == '__main__':
     import os
