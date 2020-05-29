@@ -51,6 +51,7 @@
     <Content Include=".env">
       <SubType>Code</SubType>
     </Content>
+    <Content Include="Procfile" />
     <Content Include="requirements.txt" />
     <Content Include="templates\login.html" />
   </ItemGroup>

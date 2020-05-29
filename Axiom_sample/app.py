@@ -96,7 +96,8 @@ def home():
 @app.route('/auth')
 @check_for_token
 def authorised():
-    return 'This is only viewable with a token'
+    return 'The data you are seeing right now is sensitive data and it\'s only seen after validating the token credentials'
+
 
 @app.route('/login')
 def login():
@@ -105,7 +106,7 @@ def login():
         token=jwt.encode(
             {
             'user': auth.username,
-            'exp': datetime.datetime.utcnow() + datetime.timedelta(seconds=60)
+            'exp': datetime.datetime.utcnow() + datetime.timedelta(seconds=60*60)
             },
             app.config['SECRET_KEY'])
         return jsonify({'token': token.decode('utf-8')})

@@ -3,6 +3,7 @@ Private API
 """
 from flask import Blueprint
 from flask import jsonify
+from flask import app
 from axioms_flask.decorators import has_valid_access_token, has_required_scopes
 
 private_api = Blueprint("private_api", __name__)  # pylint: disable=invalid-name
@@ -11,6 +12,7 @@ private_api = Blueprint("private_api", __name__)  # pylint: disable=invalid-name
 @private_api.route("/private", methods=["GET"])
 @has_valid_access_token
 @has_required_scopes(["openid", "profile"])
+#@check_for_token
 def api_private():
     """
     Private API - authentication required
