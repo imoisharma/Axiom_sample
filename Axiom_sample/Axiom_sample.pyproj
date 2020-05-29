@@ -52,6 +52,7 @@
       <SubType>Code</SubType>
     </Content>
     <Content Include="requirements.txt" />
+    <Content Include="templates\login.html" />
   </ItemGroup>
   <ItemGroup>
     <Interpreter Include="axiom_venv\">
@@ -66,6 +67,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="apis\" />
+    <Folder Include="templates\" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.Web.targets" />
   <!-- Specify pre- and post-build commands in the BeforeBuild and 

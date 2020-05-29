@@ -5,7 +5,9 @@ It contains the definition of routes and views for the application.
 """
 Flask Sample APIs
 """
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request,session, flash, render_template, make_response
+import jwt
+import datetime
 from flask_dotenv import DotEnv
 from apis.public import public_api
 from apis.private import private_api
@@ -13,6 +15,7 @@ from apis.role import role_api
 from apis.permission import permission_api
 from axioms_flask.error import AxiomsError
 from flask_cors import CORS
+from functools import wraps
 
 from os import environ
 
@@ -54,25 +57,58 @@ def handle_auth_error(ex):
 
 
 # Controllers API
-@app.route("/", methods=["GET"])
-def index():
-    """
-    Index for this app
-    """
-    return jsonify({"api": "Flask Sample APIs"})
-
-
-@app.route("/axioms_login")
-def login():
-    return "Welcome to Axiom_login Page"
+#@app.route("/", methods=["GET"])
+#def index():
+#    """
+#    Index for this app
+#    """
+#    return jsonify({"api": "Flask Sample APIs"})
 
 
 
 # Make the WSGI interface available at the top level so wfastcgi can get it.
 wsgi_app = app.wsgi_app
 
+app.config['SECRET_KEY']="ThisismyAxiomsSecretKey"
+def check_for_token(func):
+    @wraps(func)
+    def wrapped(*args,**kwargs):
+        token=request.args.get('token')
+        if not token:
+            return jsonify({'message':'Missing Token'}),403
+        try:
+            data=jwt.decode(token, app.config['SECRET_KEY'])
+        except:
+            return jsonify({'message':'Invalid token'}),403
+        return func(*args,**kwargs)
+    return wrapped
 
+# Axioms Login route
+@app.route('/')
+def index():
+    if not session.get("Logged in: "):
+        return render_template('login.html')
+    else:
+        return 'Currently Logged In'
 
+@app.route('/auth')
+@check_for_token
+def authorised():
+    return 'This is only viewable with a token'
+
+@app.route('/login',methods=['POST'])
+def login():
+    if request.form['username'] and request.form['password']=='password':
+        session['logged in']==True
+        token=jwt.encode(
+            {
+            'user': request.form['username'],
+            'exp': datetime.datetime.utcnow() + datetime.timedelta(seconds=60)
+            },
+            app.config['SECRET_KEY'])
+        return jsonify({'token': token.decode('utf-8')})
+    else:
+        return make_response('Unable to verify',403, {'WWW-Authenticate':'Basic Real : Login '})
 
 if __name__ == '__main__':
     import os
