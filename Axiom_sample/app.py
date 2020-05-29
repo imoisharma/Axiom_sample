@@ -85,30 +85,43 @@ def check_for_token(func):
 
 # Axioms Login route
 @app.route('/')
-def index():
-    if not session.get("Logged in: "):
-        return render_template('login.html')
-    else:
-        return 'Currently Logged In'
+def home():
+    return "Welcome to Axioms.io. Authenticate and authorize your users. Add strong authentication, fine-grained authorization in your apps, devices, and APIs within a matter of hours."
+#def index():
+#    if not session.get("Logged in: "):
+#        return render_template('login.html')
+#    else:
+#        return 'Currently Logged In'
 
 @app.route('/auth')
 @check_for_token
 def authorised():
     return 'This is only viewable with a token'
 
-@app.route('/login',methods=['POST'])
+@app.route('/login')
 def login():
-    if request.form['username'] and request.form['password']=='password':
-        session['logged in']==True
+    auth=request.authorization
+    if auth and auth.password=="password":
         token=jwt.encode(
             {
-            'user': request.form['username'],
+            'user': auth.username,
             'exp': datetime.datetime.utcnow() + datetime.timedelta(seconds=60)
             },
             app.config['SECRET_KEY'])
         return jsonify({'token': token.decode('utf-8')})
-    else:
-        return make_response('Unable to verify',403, {'WWW-Authenticate':'Basic Real : Login '})
+    return make_response("Could not verify",401,{'WWW-Authenticate':'Basic realm="login Required"'})
+
+    #if request.form['username'] and request.form['password']=='password':
+    #    session['logged in']==True
+    #    token=jwt.encode(
+    #        {
+    #        'user': request.form['username'],
+    #        'exp': datetime.datetime.utcnow() + datetime.timedelta(seconds=60)
+    #        },
+    #        app.config['SECRET_KEY'])
+    #    return jsonify({'token': token.decode('utf-8')})
+    #else:
+    #    return make_response('Unable to verify',403, {'WWW-Authenticate':'Basic Real : Login '})
 
 if __name__ == '__main__':
     import os
